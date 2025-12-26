@@ -38,9 +38,6 @@ public class VisibilityDemo {
         }
     }
 
-    // anishkumar9122461102@gmail.com anish@2006
-    // anishkumar092006@gmail.com
-
     public static void main(String[] args) throws Exception {
 
         List<String> words = List.of("apple", "banana", "apricot", "cherry", "avocado");
