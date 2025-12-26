@@ -41,8 +41,8 @@ public class MainController {
         connsumerGroup2.register(consumer3);
         connsumerGroup2.register(consumer5);
 
-        connsumerGroup1.consume();
-        connsumerGroup2.consume();
+        connsumerGroup1.consume1msgPerConsumer();
+        connsumerGroup2.consume1msgPerConsumer();
 
         String message1 = "Message1";
         String message2 = "Message2";
