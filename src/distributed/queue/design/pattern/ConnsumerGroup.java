@@ -9,6 +9,7 @@ public class ConnsumerGroup implements Consume {
     private final List<Consumer> consumerList = new CopyOnWriteArrayList<>();
     private final BlockingQueue<String> messageQueue;
     private final ExecutorService executorService;
+    private boolean running = true;
 
     public ConnsumerGroup(BlockingQueue<String> mq) {
         this.messageQueue = mq;
@@ -42,18 +43,28 @@ public class ConnsumerGroup implements Consume {
     public void consume1msgPerConsumer() {
         for (Consumer consumer: consumerList) {
             Runnable r = () -> {
-                while (true) {
+                while (running && !Thread.currentThread().isInterrupted()) {
                     String message;
                     try {
                         message = messageQueue.take();
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
                     }
                     consumer.message(message);
                 }
+                System.out.println("Terminating Thread");
             };
             executorService.submit(r);
         }
     }
+
+    public void shutdown() {
+        System.out.println("shutdown triggered");
+        running = false;
+        executorService.shutdown();
+    }
+
 
 }
