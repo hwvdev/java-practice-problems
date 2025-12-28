@@ -19,6 +19,7 @@ public final class Aircraft {
         return aircraftId;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
