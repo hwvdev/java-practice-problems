@@ -1,44 +1,51 @@
 package airline.management.system.model;
 
-public class Seat {
+import java.util.Objects;
+
+public final class Seat {
     private final String seatNo;
     private final SeatType seatType;
     private final double price;
-    private  boolean isVacant;
+    private final boolean isReserved;
+
     enum SeatType {EMERGENCY, WINDOW, AILE, BUSINESS}
 
-    public Seat(String seatNo, SeatType seatType, double price) {
+    public Seat(String seatNo, SeatType seatType, double price, boolean isReserved) {
         this.seatNo = seatNo;
         this.seatType = seatType;
         this.price = price;
-        this.isVacant = true;
-    }
-    public Seat(Seat seat) {
-        this.seatNo = seat.seatNo;
-        this.seatType = seat.seatType;
-        this.price = seat.price;
-        this.isVacant = seat.isVacant;
+        this.isReserved = isReserved;
     }
 
-    public void reserve() {
-        if (!isVacant)
-            throw new RuntimeException("Seat is Reserved");
-        isVacant = false;
-    }
-
-    public void unReserve() {
-        if (isVacant)
-            throw new RuntimeException("Seat Already Unreserved");
-        isVacant = true;
+    public Seat reserve(boolean reserved) {
+        return new Seat(this.seatNo, this.seatType, this.price, true);
     }
 
     public String getSeatNo() {
         return seatNo;
     }
+
+    public boolean isReserved() {
+        return isReserved;
+    }
+
+    public SeatType getSeatType() {
+        return seatType;
+    }
+
     public double getPrice() {
         return price;
     }
-    public boolean isVacant() {
-        return isVacant;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Seat seat = (Seat) o;
+        return Double.compare(price, seat.price) == 0 && Objects.equals(seatNo, seat.seatNo) && seatType == seat.seatType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seatNo, seatType, price);
     }
 }

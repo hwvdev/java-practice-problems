@@ -1,19 +1,33 @@
 package airline.management.system.model;
 
-public class Aircraft {
-    private final String flightName;
-    private final String flightNo;
+import java.util.Objects;
 
-    public Aircraft(String flightName, String flightNo) {
-        this.flightName = flightName;
-        this.flightNo = flightNo;
+public final class Aircraft {
+    private final String aircraftName;
+    private final String aircraftId;
+
+    public Aircraft(String aircraftName, String aircraftId) {
+        this.aircraftName = aircraftName;
+        this.aircraftId = aircraftId;
     }
 
-    public String getFlightName() {
-        return flightName;
+    public String getAircraftName() {
+        return aircraftName;
     }
 
-    public String getFlightNo() {
-        return flightNo;
+    public String getAircraftId() {
+        return aircraftId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Aircraft aircraft = (Aircraft) o;
+        return Objects.equals(aircraftName, aircraft.aircraftName) && Objects.equals(aircraftId, aircraft.aircraftId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aircraftName, aircraftId);
     }
 }

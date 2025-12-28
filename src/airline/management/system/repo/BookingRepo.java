@@ -1,39 +1,31 @@
 package airline.management.system.repo;
 
-import airline.management.system.model.BookingInfo;
+import airline.management.system.model.Booking;
+import airline.management.system.model.BookingStatus;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BookingRepo {
-    private final Map<String, BookingInfo> bookingInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, Booking> bookingInfoMap = new ConcurrentHashMap<>();
 
-    private BookingRepo() {
+    public BookingRepo() {
     }
 
-    private static final BookingRepo BOOKING_REPO_INSTANCE;
-
-    static {
-        BOOKING_REPO_INSTANCE = new BookingRepo();
+    public void saveBooking(Booking booking) {
+        bookingInfoMap.putIfAbsent(booking.getBookingId(), booking);
     }
 
-    public static BookingRepo getBookingRepoInstance() {
-        return BOOKING_REPO_INSTANCE;
+    public Booking getBookingById(String bookingId) {
+        return bookingInfoMap.get(bookingId);
     }
 
-    public BookingInfo bookSeat(String bookingId, BookingInfo bookingInfo) {
-        return bookingInfoMap.put(bookingId, bookingInfo);
-    }
-
-    public BookingInfo getBookingDetails(String bookingId) {
-        return bookingInfoMap.getOrDefault(bookingId, null);
-    }
-
-    public void cancelBooking(String bookingId) {
-        bookingInfoMap.computeIfPresent(bookingId, (k, v) -> {
-            v.getSeat().unReserve();
+    public void cancelBookingById(String bookingId) {
+        bookingInfoMap.computeIfPresent(bookingId, (k, v)-> {
+            if (BookingStatus.CANCELLED.equals(v.getBookingStatus()))
+                throw new RuntimeException("Booking is cancelled already");
+            v.updateBookingStatus(BookingStatus.CANCELLED);
             return v;
         });
     }
-
 }

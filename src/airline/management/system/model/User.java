@@ -1,6 +1,6 @@
 package airline.management.system.model;
 
-public class User {
+public final class User {
     private final String email;
     private final String name;
     private final UserType userType;
