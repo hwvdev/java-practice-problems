@@ -11,10 +11,18 @@ public class UserService {
     }
 
     public void registerUser(User user) {
-        userRepo.registerUser(user);
+        userRepo.add(user);
     }
 
     public User getUser(String email) {
-        return userRepo.getUser(email);
+        return userRepo.getUserByEmail(email).orElseThrow(() -> new RuntimeException("User Not Found with given email"));
+    }
+
+    public User userByUserId(String userId) {
+        return userRepo.getUserById(userId).orElseThrow(() -> new RuntimeException("User Not Found"));
+    }
+
+    public User userByEmail(String email) {
+        return userRepo.getUserByEmail(email).orElseThrow(() -> new RuntimeException("user does exist for given email"));
     }
 }

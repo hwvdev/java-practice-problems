@@ -1,27 +1,28 @@
 package airline.management.system.repo;
 
+import airline.management.system.data.store.InMemoryStore;
+import airline.management.system.exception.AlreadyRegisteredAircraftException;
 import airline.management.system.model.Aircraft;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class AircraftRepo {
-    private final static AircraftRepo AIRCRAFT_INSTANCE = new AircraftRepo();
+    private final Map<String, Aircraft> aircraftMap;
 
-    private final Map<String, Aircraft> registeredAircraft = new ConcurrentHashMap<>();
-
-    private AircraftRepo() {}
-
-    public static AircraftRepo getAircraftInstance() {
-        return AIRCRAFT_INSTANCE;
+    private AircraftRepo(InMemoryStore store) {
+        this.aircraftMap = store.aircraftMap;
     }
 
-    public void addAircraft(Aircraft aircraft) {
-        registeredAircraft.put(aircraft.getAircraftId(), aircraft);
-    }
-    public Optional<Aircraft> getAircraftById(String flightNo) {
-        return Optional.ofNullable(registeredAircraft.getOrDefault(flightNo, null));
+    public void save(Aircraft aircraft) {
+        aircraftMap.compute(aircraft.getAircraftId(), (key, craft) -> {
+            if (craft!=null)
+                throw new AlreadyRegisteredAircraftException("Aircraft is already registered, aircraftId: " + aircraft.getAircraftId());
+            return aircraft;
+        });
     }
 
+    public Optional<Aircraft> findById(String aircraftId) {
+        return Optional.ofNullable(aircraftMap.get(aircraftId));
+    }
 }

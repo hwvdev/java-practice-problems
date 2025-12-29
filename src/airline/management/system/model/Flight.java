@@ -1,31 +1,50 @@
 package airline.management.system.model;
 
-import java.util.Map;
 import java.util.UUID;
 
 public final class Flight {
-    private final String flightNo;
+    private final String flightId;
     private final Aircraft aircraft;
     private final String source;
     private final long startTime;
     private final long endTime;
     private final String dest;
-    private final SeatInventory seatInventory;
-    private FlightStatus flightStatus;
+    private final FlightStatus flightStatus;
 
-    public Flight(Aircraft aircraft, String source, long startTime, long endTime, String dest, SeatInventory seatInventory) {
-        this.flightNo = UUID.randomUUID().toString();
+    public Flight(Aircraft aircraft, String source, long startTime, long endTime, String dest) {
+        this.flightId = UUID.randomUUID().toString();
         this.aircraft = aircraft;
         this.source = source;
         this.startTime = startTime;
         this.endTime = endTime;
         this.dest = dest;
-        this.seatInventory = seatInventory;
         this.flightStatus = FlightStatus.ON_TIME;
     }
 
-    public String getFlightNo() {
-        return flightNo;
+    public Flight(String flightId, Aircraft aircraft, String source, long startTime, long endTime, String dest, FlightStatus flightStatus) {
+        this.flightId = flightId;
+        this.aircraft = aircraft;
+        this.source = source;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.dest = dest;
+        this.flightStatus = flightStatus;
+    }
+
+    public FlightStatus getFlightStatus() {
+        return flightStatus;
+    }
+
+    public Flight updateSchedule(long startTime, long endTime) {
+        return new Flight(this.flightId, this.aircraft, this.source, startTime, endTime, this.dest, this.flightStatus);
+    }
+
+    public Flight updateStatus(FlightStatus flightStatus) {
+        return new Flight(this.flightId, this.aircraft, this.source, this.startTime, this.endTime, this.dest, flightStatus);
+    }
+
+    public String getFlightId() {
+        return flightId;
     }
 
     public Aircraft getAircraft() {
@@ -46,23 +65,5 @@ public final class Flight {
 
     public String getDest() {
         return dest;
-    }
-
-    public SeatInventory getSeatInventory() {
-        return seatInventory;
-    }
-
-    public Map<String, Seat> getSeatMap() {
-        return seatInventory.getAvailableSeats();
-    }
-
-    public void flightDelayed() {
-        this.flightStatus = FlightStatus.DELAYED;
-    }
-    public void flightCancelled() {
-        this.flightStatus = FlightStatus.CANCELLED;
-    }
-    public Seat getSeat(String seatNo) {
-        return seatInventory.getSeat(seatNo);
     }
 }

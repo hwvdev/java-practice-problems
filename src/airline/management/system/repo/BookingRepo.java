@@ -1,31 +1,42 @@
 package airline.management.system.repo;
 
+import airline.management.system.data.store.InMemoryStore;
 import airline.management.system.model.Booking;
-import airline.management.system.model.BookingStatus;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 public class BookingRepo {
-    private final Map<String, Booking> bookingInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, Booking> bookingMapByBookingId;
 
-    public BookingRepo() {
+    public BookingRepo(InMemoryStore store) {
+        this.bookingMapByBookingId = store.bookingMapByBookingId;
     }
 
     public void saveBooking(Booking booking) {
-        bookingInfoMap.putIfAbsent(booking.getBookingId(), booking);
-    }
-
-    public Booking getBookingById(String bookingId) {
-        return bookingInfoMap.get(bookingId);
-    }
-
-    public void cancelBookingById(String bookingId) {
-        bookingInfoMap.computeIfPresent(bookingId, (k, v)-> {
-            if (BookingStatus.CANCELLED.equals(v.getBookingStatus()))
-                throw new RuntimeException("Booking is cancelled already");
-            v.updateBookingStatus(BookingStatus.CANCELLED);
-            return v;
+        bookingMapByBookingId.compute(booking.getBookingId(), (bookId, existingBooking) -> {
+            if (existingBooking!=null) {
+                throw new RuntimeException("Booking already exists");
+            }
+            return booking;
         });
+    }
+
+    public Optional<Booking> getBookingById(String bookingId) {
+        return Optional.ofNullable(bookingMapByBookingId.get(bookingId)).map(booking
+                -> new Booking(bookingId, booking.getPassenger(), booking.getFlightId(), booking.getSeatId(), booking.getBookingStatus()));
+    }
+
+    public void cancelBooking(Booking cancelledBooking) {
+        bookingMapByBookingId.compute(cancelledBooking.getBookingId(), (id, existingBooking) -> {
+            if (existingBooking == null) {
+                throw new RuntimeException("Booking is invalid");
+            }
+            return cancelledBooking;
+        });
+    }
+
+    public void reStoreBooking(Booking currBooking) {
+        bookingMapByBookingId.put(currBooking.getBookingId(), currBooking);
     }
 }

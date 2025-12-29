@@ -17,8 +17,12 @@ public final class Seat {
         this.isReserved = isReserved;
     }
 
-    public Seat reserve(boolean reserved) {
+    public Seat reserve() {
         return new Seat(this.seatNo, this.seatType, this.price, true);
+    }
+
+    public Seat unReserve() {
+        return new Seat(this.seatNo, this.seatType, this.price, false);
     }
 
     public String getSeatNo() {
@@ -41,11 +45,11 @@ public final class Seat {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Seat seat = (Seat) o;
-        return Double.compare(price, seat.price) == 0 && Objects.equals(seatNo, seat.seatNo) && seatType == seat.seatType;
+        return Double.compare(price, seat.price) == 0 && Objects.equals(seatNo, seat.seatNo) && seatType == seat.seatType && isReserved == seat.isReserved;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(seatNo, seatType, price);
+        return Objects.hash(seatNo, seatType, price, isReserved);
     }
 }
