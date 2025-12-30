@@ -17,40 +17,35 @@ public class BookingService {
     }
 
     public Booking reserveBooking(String seatId, String flightId, User passagner) {
+        Object lock = LockRegistry.getLockRegistryInstance().getLock(flightId);
+
         Flight flight = flightRepo.getFlightById(flightId);
         if (flight == null)
             throw new RuntimeException("Flight does not exist");
         if (flight.getFlightStatus() != FlightStatus.BOOKING_OPEN)
             throw new RuntimeException("Booking closed");
 
-        seatRepo.reserve(flightId, seatId);
-        try {
+        synchronized (lock) {
+            seatRepo.reserve(flightId, seatId);
             Booking booking = new Booking(passagner.getUserId(), flightId, seatId);
             bookingRepo.saveBooking(booking);
             return booking;
-        } catch (RuntimeException exx) {
-            seatRepo.rollbackToUnreserve(flightId, seatId);
-            exx.printStackTrace();
-            throw new RuntimeException("Could not book");
         }
     }
 
     public Booking cancelBooking(String bookingId) {
-        Booking currentBooking = bookingRepo.getBookingById(bookingId).orElseThrow(() -> new RuntimeException("Invalid booking"));
-        Flight flight = flightRepo.getFlightById(currentBooking.getFlightId());
-        if (flight.getFlightStatus() != FlightStatus.BOOKING_OPEN) {
-            throw new RuntimeException("Cannot cancel booking after closure of booking period");
-        }
+        Object lock = LockRegistry.getLockRegistryInstance().getLock(bookingId);
+        synchronized (lock) {
+            Booking currentBooking = bookingRepo.getBookingById(bookingId).orElseThrow(() -> new RuntimeException("Invalid booking"));
+            Flight flight = flightRepo.getFlightById(currentBooking.getFlightId());
+            if (flight.getFlightStatus() != FlightStatus.BOOKING_OPEN) {
+                throw new RuntimeException("Cannot cancel booking after closure of booking period");
+            }
 
-        seatRepo.unReserve(currentBooking.getFlightId(), currentBooking.getSeatId());
-        try {
+            seatRepo.unReserve(currentBooking.getFlightId(), currentBooking.getSeatId());
             Booking cancelledBooking = currentBooking.updateStatus(BookingStatus.CANCELLED);
             bookingRepo.cancelBooking(cancelledBooking);
             return cancelledBooking;
-        } catch (RuntimeException ex) {
-            seatRepo.rollbackToReserve(currentBooking.getBookingId(), currentBooking.getSeatId());
-            ex.printStackTrace();
-            throw new RuntimeException("Could not cancel");
         }
     }
 }
