@@ -4,8 +4,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Printer {
 
-    private Lock lock = new ReentrantLock(true);
-
     public void print() {
         for (int i = 0; i < 10; i++) {
             if (i % 2 == 0 && Thread.currentThread().getName().equals("Even")) {
@@ -18,7 +16,7 @@ public class Printer {
             } else if (i % 2 == 1 && Thread.currentThread().getName().equals("Odd")) {
                 System.out.println(Thread.currentThread().getName() + ": " + i);
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(8);
                 } catch (InterruptedException e) {
                     notify();
                 }
