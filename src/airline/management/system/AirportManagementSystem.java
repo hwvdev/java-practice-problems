@@ -57,6 +57,7 @@ public class AirportManagementSystem {
         bookingService.reserveBooking("3C", flight1.getFlightId(), user1);
         seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
         System.out.println(seatMap1);
+
         bookingService.reserveBooking("1A", flight1.getFlightId(), user1);
         seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
         System.out.println(seatMap1);
