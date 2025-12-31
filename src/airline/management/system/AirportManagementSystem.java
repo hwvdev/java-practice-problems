@@ -54,14 +54,22 @@ public class AirportManagementSystem {
         Map<String, Seat> seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
         System.out.println(seatMap1);
 
-        bookingService.reserveBooking("3C", flight1.getFlightId(), user1);
+        Booking booking1 = bookingService.reserveBooking("3C", flight1.getFlightId(), user1);
         seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
         System.out.println(seatMap1);
 
-        bookingService.reserveBooking("1A", flight1.getFlightId(), user1);
+        Booking booking2 = bookingService.reserveBooking("1A", flight1.getFlightId(), user1);
+        seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
+        System.out.println(seatMap1);
+        bookingService.cancelBooking(booking1.getBookingId());
         seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
         System.out.println(seatMap1);
 
+        Booking booking3 = bookingService.reserveBooking("3C", flight1.getFlightId(), user1);
+        seatMap1 = flightService.getSeatLayoutMap(flight1.getFlightId());
+        System.out.println(seatMap1);
 
+        System.out.println(booking1.getBookingId());
+        System.out.println(booking3.getBookingId());
     }
 }
