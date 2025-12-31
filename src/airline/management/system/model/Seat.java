@@ -8,8 +8,6 @@ public final class Seat {
     private final double price;
     private final boolean isReserved;
 
-    enum SeatType {EMERGENCY, WINDOW, AILE, BUSINESS}
-
     public Seat(String seatNo, SeatType seatType, double price, boolean isReserved) {
         this.seatNo = seatNo;
         this.seatType = seatType;
@@ -51,5 +49,15 @@ public final class Seat {
     @Override
     public int hashCode() {
         return Objects.hash(seatNo, seatType, price, isReserved);
+    }
+
+    @Override
+    public String toString() {
+        return "Seat{" +
+                "seatNo='" + seatNo + '\'' +
+                ", seatType=" + seatType +
+                ", price=" + price +
+                ", isReserved=" + isReserved +
+                '}' + "\n";
     }
 }

@@ -4,16 +4,16 @@ import java.util.UUID;
 
 public final class Flight {
     private final String flightId;
-    private final Aircraft aircraft;
+    private final String aircraftId;
     private final String source;
     private final long startTime;
     private final long endTime;
     private final String dest;
     private final FlightStatus flightStatus;
 
-    public Flight(Aircraft aircraft, String source, long startTime, long endTime, String dest) {
+    public Flight(String aircraft, String source, long startTime, long endTime, String dest) {
         this.flightId = UUID.randomUUID().toString();
-        this.aircraft = aircraft;
+        this.aircraftId = aircraft;
         this.source = source;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -21,9 +21,9 @@ public final class Flight {
         this.flightStatus = FlightStatus.ON_TIME;
     }
 
-    public Flight(String flightId, Aircraft aircraft, String source, long startTime, long endTime, String dest, FlightStatus flightStatus) {
+    public Flight(String flightId, String aircraft, String source, long startTime, long endTime, String dest, FlightStatus flightStatus) {
         this.flightId = flightId;
-        this.aircraft = aircraft;
+        this.aircraftId = aircraft;
         this.source = source;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -36,19 +36,19 @@ public final class Flight {
     }
 
     public Flight updateSchedule(long startTime, long endTime) {
-        return new Flight(this.flightId, this.aircraft, this.source, startTime, endTime, this.dest, this.flightStatus);
+        return new Flight(this.flightId, this.aircraftId, this.source, startTime, endTime, this.dest, this.flightStatus);
     }
 
     public Flight updateStatus(FlightStatus flightStatus) {
-        return new Flight(this.flightId, this.aircraft, this.source, this.startTime, this.endTime, this.dest, flightStatus);
+        return new Flight(this.flightId, this.aircraftId, this.source, this.startTime, this.endTime, this.dest, flightStatus);
     }
 
     public String getFlightId() {
         return flightId;
     }
 
-    public Aircraft getAircraft() {
-        return aircraft;
+    public String getAircraftId() {
+        return aircraftId;
     }
 
     public String getSource() {
@@ -65,5 +65,18 @@ public final class Flight {
 
     public String getDest() {
         return dest;
+    }
+
+    @Override
+    public String toString() {
+        return "Flight{" +
+                "flightId='" + flightId + '\'' +
+                ", aircraftId='" + aircraftId + '\'' +
+                ", source='" + source + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", dest='" + dest + '\'' +
+                ", flightStatus=" + flightStatus +
+                '}';
     }
 }

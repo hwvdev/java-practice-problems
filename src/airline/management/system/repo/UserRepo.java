@@ -31,7 +31,7 @@ public class UserRepo {
             if (Objects.equals(email, existingUser.getEmail())) {
                 throw new RuntimeException("Email already exists");
             }
-            return new User(userId, email, existingUser.getName(), existingUser.getUserType());
+            return new User(existingUser.getUserId(), email, existingUser.getName(), existingUser.getUserType());
         });
     }
 

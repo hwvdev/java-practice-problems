@@ -14,10 +14,6 @@ public class UserService {
         userRepo.add(user);
     }
 
-    public User getUser(String email) {
-        return userRepo.getUserByEmail(email).orElseThrow(() -> new RuntimeException("User Not Found with given email"));
-    }
-
     public User userByUserId(String userId) {
         return userRepo.getUserById(userId).orElseThrow(() -> new RuntimeException("User Not Found"));
     }

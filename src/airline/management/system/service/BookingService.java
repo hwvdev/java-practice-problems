@@ -17,7 +17,8 @@ public class BookingService {
     }
 
     public Booking reserveBooking(String seatId, String flightId, User passagner) {
-        Object lock = LockRegistry.getLockRegistryInstance().getLock(flightId);
+        String flightSeatId = flightId+":"+seatId;
+        Object lock = LockRegistry.getLockRegistryInstance().getLock(flightSeatId);
 
         Flight flight = flightRepo.getFlightById(flightId);
         if (flight == null)
@@ -34,14 +35,16 @@ public class BookingService {
     }
 
     public Booking cancelBooking(String bookingId) {
-            Booking currentBooking = bookingRepo.getBookingById(bookingId).orElseThrow(() -> new RuntimeException("Invalid booking"));
-            Flight flight = flightRepo.getFlightById(currentBooking.getFlightId());
-            if (flight.getFlightStatus() != FlightStatus.BOOKING_OPEN) {
-                throw new RuntimeException("Cannot cancel booking after closure of booking period");
-            }
-
-        Object lock = LockRegistry.getLockRegistryInstance().getLock(bookingId);
+        Booking currentBooking = bookingRepo.getBookingById(bookingId).orElseThrow(() -> new RuntimeException("Invalid booking"));
+        String flightSeatId = currentBooking.getFlightId()+":"+currentBooking.getSeatId();
+        Object lock = LockRegistry.getLockRegistryInstance().getLock(flightSeatId);
         synchronized (lock) {
+
+            Flight flight = flightRepo.getFlightById(currentBooking.getFlightId());
+        if (flight.getFlightStatus() != FlightStatus.BOOKING_OPEN) {
+            throw new RuntimeException("Cannot cancel booking after closure of booking period");
+        }
+
             seatRepo.unReserve(currentBooking.getFlightId(), currentBooking.getSeatId());
             Booking cancelledBooking = currentBooking.updateStatus(BookingStatus.CANCELLED);
             bookingRepo.cancelBooking(cancelledBooking);

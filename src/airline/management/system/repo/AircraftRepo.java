@@ -10,7 +10,7 @@ import java.util.Optional;
 public class AircraftRepo {
     private final Map<String, Aircraft> aircraftMap;
 
-    private AircraftRepo(InMemoryStore store) {
+    public AircraftRepo(InMemoryStore store) {
         this.aircraftMap = store.aircraftMap;
     }
 
