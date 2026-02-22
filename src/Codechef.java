@@ -4,7 +4,9 @@ import java.io.*;
 
 class Codechef {
 	public static void main (String[] args) throws java.lang.Exception{
-		
+
+        // 76. Minimum Window Substring
+
 		System.out.println("Message");
 		Map<Character, Integer> m = new HashMap<>();
 		String s="vijayijy";
@@ -18,7 +20,7 @@ class Codechef {
        	int j=0;
 
         int length = Integer.MAX_VALUE;
-        int ansi=0, ansj=0;
+        int ansi=0, ansj=-1;
         Map<Character, Integer> temp = new HashMap<>();
         while(j<n) {
             char ch = s.charAt(j);
@@ -46,7 +48,7 @@ class Codechef {
             }
             j++;
         }
-        System.out.println("Message: "+ansi +" "+ ansj);
+        System.out.println(s.substring(ansi, ansj+1));
 	}
 	
 	public static boolean compare(Map<Character, Integer> temp, Map<Character, Integer> map) {
