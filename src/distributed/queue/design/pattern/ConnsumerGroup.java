@@ -2,17 +2,17 @@ package distributed.queue.design.pattern;
 
 import distributed.queue.model.Consumer;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ConnsumerGroup implements Consume {
     private final List<Consumer> consumerList = new CopyOnWriteArrayList<>();
     private final BlockingQueue<String> messageQueue;
-    private final ExecutorService executorService;
 
     public ConnsumerGroup(BlockingQueue<String> mq) {
         this.messageQueue = mq;
-        this.executorService = Executors.newFixedThreadPool(5);
     }
 
     public void register(Consumer c) {
@@ -20,7 +20,6 @@ public class ConnsumerGroup implements Consume {
     }
 
     public void consume() {
-
         Thread t = new Thread(() -> {
             while (true) {
                 if (messageQueue.isEmpty())
@@ -37,49 +36,6 @@ public class ConnsumerGroup implements Consume {
             }
         });
         t.start();
-    }
-
-    public void consume1msgPerConsumer() {
-        for (Consumer consumer: consumerList) {
-            Runnable r = () -> {
-                while (true) {
-                    String message = null;
-                    try {
-                        message = messageQueue.take();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    consumer.message(message);
-                }
-            };
-            executorService.submit(r);
-        }
-    }
-
-    interface Color {
-        void applyColor();
-    }
-
-    class Red implements Color {
-        public void applyColor() {
-            System.out.println("Applying red color");
-        }
-    }
-
-    class Blue implements Color {
-        public void applyColor() {
-            System.out.println("Applying blue color");
-        }
-    }
-
-    abstract class Shape {
-        private final Color color;
-
-        Shape(Color color) {
-            this.color = color;
-        }
-
-        abstract void draw();
     }
 
 }
