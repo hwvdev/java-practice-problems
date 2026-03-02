@@ -7,6 +7,7 @@ import parkingLotV2.entities.vehicle.Vehicle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TicketManager {
     private final Map<String, Ticket> activeTickets;
@@ -25,13 +26,15 @@ public class TicketManager {
         return ticket;
     }
 
-    public Ticket closeTicket(String ticketId) {
-        Ticket ticket = activeTickets.get(ticketId);
-        if (ticket == null) {
-            throw new IllegalStateException("invalid ticket");
-        }
-        ticket.setExitTime();
-        activeTickets.remove(ticketId);
+    public AtomicReference<Ticket> closeTicket(String ticketId) {
+        AtomicReference<Ticket> ticket = new AtomicReference<>(null);
+        activeTickets.compute(ticketId, (k, existingticket) -> {
+            if (existingticket == null)
+                throw new IllegalStateException("Invalid Ticket");
+            existingticket.setExitTime();
+            ticket.set(existingticket);
+            return null;
+        });
         return ticket;
     }
 }

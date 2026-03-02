@@ -9,7 +9,8 @@ import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.enums.SpotType;
 import parkingLotV2.enums.VehicleType;
 import parkingLotV2.parkingStrategy.impl.NearestSpot;
-import parkingLotV2.paymentStrategy.impl.FlatRate;
+import parkingLotV2.payment.PaymentService;
+import parkingLotV2.payment.strategy.FlatRateStrategy;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -17,7 +18,6 @@ import java.util.Map;
 public class MainController {
     public static void main(String[] args) {
 
-        // Create a parking lot with 2 floors, each having 2 bike spots, 3 car spots, and 1 truck spot
         ParkingSpot bikeSpot1 = new ParkingSpot(1, SpotType.BIKE);
         ParkingSpot bikeSpot2 = new ParkingSpot(2, SpotType.BIKE);
         ParkingSpot bikeSpot3 = new ParkingSpot(3, SpotType.BIKE);
@@ -51,17 +51,16 @@ public class MainController {
                 floor2.floorNumber(), floor2
         );
 
-        ParkingLot parkingLot = new ParkingLot(floors, new NearestSpot(), new FlatRate(new BigDecimal(10.0), "Rs."));
+        PaymentService paymentService = new PaymentService(new FlatRateStrategy(BigDecimal.valueOf(90), "INR"));
+        ParkingLot parkingLot = new ParkingLot(floors, new NearestSpot(), paymentService);
 
         // Create some vehicles
         Vehicle bike1 = new Bike("BIKE123", VehicleType.BIKE);
         Vehicle bike2 = new Bike("BIKE456", VehicleType.BIKE);
         Vehicle bike3 = new Bike("BIKE789", VehicleType.BIKE);
 
-
         Vehicle car1 = new Car("CAR789", VehicleType.CAR);
         Vehicle car2 = new Car("CAR789", VehicleType.CAR);
-        // Park the vehicles
 
         try {
             Ticket ticket1 = parkingLot.parkVehicle(bike1).get();
@@ -80,12 +79,10 @@ public class MainController {
                 });
             });
 
-            for (Map.Entry<String, Ticket> m : parkingLot.getTicketmap().entrySet())
-                System.out.println(m.getValue());
-
             Thread.sleep(1000);
             parkingLot.unparkVehicle(ticket1.getTicketId());
             parkingLot.unparkVehicle(ticket4.getTicketId());
+            parkingLot.unparkVehicle(ticket1.getTicketId());
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         } catch (InterruptedException e) {

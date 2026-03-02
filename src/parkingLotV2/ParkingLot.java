@@ -6,24 +6,29 @@ import parkingLotV2.entities.ParkingSpot;
 import parkingLotV2.entities.Ticket;
 import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.parkingStrategy.ParkingStrategy;
-import parkingLotV2.paymentStrategy.PaymentStrategy;
+import parkingLotV2.payment.PaymentMethod;
+import parkingLotV2.payment.PaymentResponse;
+import parkingLotV2.payment.PaymentService;
+import parkingLotV2.payment.PaymentStatus;
+import parkingLotV2.payment.processor.PaymentProcessor;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ParkingLot {
     private final Map<Integer, Floor> floors;
     private final int floorsCount;
     private final TicketManager ticketManager;
     private final ParkingStrategy parkingStrategy;
-    private final PaymentStrategy paymentStrategy;
+    private final PaymentService paymentService;
 
-    public ParkingLot(Map<Integer, Floor> floors, ParkingStrategy parkingStrategy, PaymentStrategy paymentStrategy) {
+    public ParkingLot(Map<Integer, Floor> floors, ParkingStrategy parkingStrategy, PaymentService paymentService) {
         this.floors = floors;
         this.floorsCount = floors.size();
         this.ticketManager = new TicketManager();
         this.parkingStrategy = parkingStrategy;
-        this.paymentStrategy = paymentStrategy;
+        this.paymentService = paymentService;
     }
 
     private void addFloor(Floor floor) {
@@ -42,7 +47,7 @@ public class ParkingLot {
         return floorsCount;
     }
 
-    public Optional<Ticket> parkVehicle(Vehicle vehicle) {
+    public synchronized Optional<Ticket> parkVehicle(Vehicle vehicle) {
         Optional<Ticket> ticketOptional = Optional.empty();
         Optional<ParkingSpotDto> spotDto = parkingStrategy.getParkingSpot(this, vehicle.getVehicleType());
         if (spotDto.isPresent()) {
@@ -52,15 +57,20 @@ public class ParkingLot {
         return ticketOptional;
     }
 
-    public synchronized Ticket unparkVehicle(String ticketId) {
-        Ticket ticket = ticketManager.closeTicket(ticketId);
+    public synchronized Ticket unparkVehicle(String ticketId) throws InterruptedException {
+        AtomicReference<Ticket> ticketRef = ticketManager.closeTicket(ticketId);
+        Ticket ticket = ticketRef.get();
+        Optional<PaymentResponse> paymentResponse = paymentService.processPayment(ticket, PaymentMethod.UPI);
 
-        ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
-        ParkingSpot parkingSpot = floors.get(parkingSpotDto.floorNumber()).parkingSpots().get(parkingSpotDto.spotId());
-        parkingSpot.unpark();
-
-        ticket = paymentStrategy.pay(ticket);
-
+        if (paymentResponse.isPresent() && PaymentStatus.SUCCESS.equals(paymentResponse.get().getPaymentStatus())) {
+            ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
+            ParkingSpot parkingSpot = Optional.ofNullable(floors.get(parkingSpotDto.floorNumber()))
+                    .map(Floor::parkingSpots)
+                    .map(spot -> spot.get(parkingSpotDto.spotId()))
+                    .orElseThrow(() -> new IllegalStateException("Invalid"));
+            ticket.setParkingFee(paymentResponse.get().getAmount());
+            parkingSpot.unpark();
+        }
         System.out.println(ticket);
         return ticket;
     }
