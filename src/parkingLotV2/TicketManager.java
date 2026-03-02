@@ -8,11 +8,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TikcetManager {
+public class TicketManager {
     private final Map<String, Ticket> activeTickets;
 
-    public TikcetManager() {
+    public TicketManager() {
         this.activeTickets = new ConcurrentHashMap<>();
+    }
+
+    public Map<String, Ticket> getActiveTicket() {
+        return Collections.unmodifiableMap(activeTickets);
     }
 
     public Ticket generateTicket(Vehicle vehicle, ParkingSpotDto parkingSpot) {
@@ -21,18 +25,13 @@ public class TikcetManager {
         return ticket;
     }
 
-    public void setExitTime(String ticketId) {
-        activeTickets.computeIfPresent(ticketId, (k, v) -> {
-            v.setExitTime();
-            return v;
-        });
-    }
-
-    public void removeTicket(String ticketId) {
+    public Ticket closeTicket(String ticketId) {
+        Ticket ticket = activeTickets.get(ticketId);
+        if (ticket == null) {
+            throw new IllegalStateException("invalid ticket");
+        }
+        ticket.setExitTime();
         activeTickets.remove(ticketId);
-    }
-
-    public Map<String, Ticket> getActiveTickets() {
-        return Collections.unmodifiableMap(activeTickets);
+        return ticket;
     }
 }

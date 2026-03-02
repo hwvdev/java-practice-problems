@@ -12,14 +12,14 @@ public class Ticket {
     private final long entryTime;
     private final Vehicle vehicle;
     private long exitTime = 0L;
-    private double parkingFee;
+    private Money parkingFee;
 
     public Ticket(ParkingSpotDto parkingSpot, Vehicle vehicle) {
         this.ticketId = UUID.randomUUID().toString();
         this.parkingSpotDto = parkingSpot;
         this.entryTime = System.currentTimeMillis();
         this.vehicle = vehicle;
-        this.parkingFee = 0;
+        this.parkingFee = null;
     }
 
     public SpotType spotType() {
@@ -38,12 +38,20 @@ public class Ticket {
         }
     }
 
-    public void setParkingFee(Double parkingFee) {
+    public void setParkingFee(Money parkingFee) {
         this.parkingFee = parkingFee;
     }
 
     public ParkingSpotDto getParkingSpotDto() {
         return parkingSpotDto;
+    }
+
+    public long getExitTime() {
+        return exitTime;
+    }
+
+    public long getEntryTime() {
+        return entryTime;
     }
 
     @Override

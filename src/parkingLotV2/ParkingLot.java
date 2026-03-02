@@ -14,14 +14,14 @@ import java.util.Optional;
 public class ParkingLot {
     private final Map<Integer, Floor> floors;
     private final int floorsCount;
-    private final TikcetManager ticketManager;
+    private final TicketManager ticketManager;
     private final ParkingStrategy parkingStrategy;
     private final PaymentStrategy paymentStrategy;
 
     public ParkingLot(Map<Integer, Floor> floors, ParkingStrategy parkingStrategy, PaymentStrategy paymentStrategy) {
         this.floors = floors;
         this.floorsCount = floors.size();
-        this.ticketManager = new TikcetManager();
+        this.ticketManager = new TicketManager();
         this.parkingStrategy = parkingStrategy;
         this.paymentStrategy = paymentStrategy;
     }
@@ -31,7 +31,7 @@ public class ParkingLot {
     }
 
     public Map<String, Ticket> getTicketmap() {
-        return ticketManager.getActiveTickets();
+        return ticketManager.getActiveTicket();
     }
 
     public Map<Integer, Floor> getFloors() {
@@ -52,14 +52,15 @@ public class ParkingLot {
         return ticketOptional;
     }
 
-    public synchronized Ticket unparkVehicle(Ticket ticket) {
-        ticketManager.setExitTime(ticket.getTicketId());
+    public synchronized Ticket unparkVehicle(String ticketId) {
+        Ticket ticket = ticketManager.closeTicket(ticketId);
+
         ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
         ParkingSpot parkingSpot = floors.get(parkingSpotDto.floorNumber()).parkingSpots().get(parkingSpotDto.spotId());
         parkingSpot.unpark();
-        Double amount = paymentStrategy.pay(ticket);
-        ticket.setParkingFee(amount);
-        ticketManager.removeTicket(ticket.getTicketId());
+
+        ticket = paymentStrategy.pay(ticket);
+
         System.out.println(ticket);
         return ticket;
     }

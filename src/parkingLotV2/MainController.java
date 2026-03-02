@@ -11,6 +11,7 @@ import parkingLotV2.enums.VehicleType;
 import parkingLotV2.parkingStrategy.impl.NearestSpot;
 import parkingLotV2.paymentStrategy.impl.FlatRate;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class MainController {
@@ -50,7 +51,7 @@ public class MainController {
                 floor2.floorNumber(), floor2
         );
 
-        ParkingLot parkingLot = new ParkingLot(floors, new NearestSpot(), new FlatRate(200.0));
+        ParkingLot parkingLot = new ParkingLot(floors, new NearestSpot(), new FlatRate(new BigDecimal(10.0), "Rs."));
 
         // Create some vehicles
         Vehicle bike1 = new Bike("BIKE123", VehicleType.BIKE);
@@ -83,8 +84,8 @@ public class MainController {
                 System.out.println(m.getValue());
 
             Thread.sleep(1000);
-            parkingLot.unparkVehicle(ticket1);
-            parkingLot.unparkVehicle(ticket4);
+            parkingLot.unparkVehicle(ticket1.getTicketId());
+            parkingLot.unparkVehicle(ticket4.getTicketId());
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         } catch (InterruptedException e) {
