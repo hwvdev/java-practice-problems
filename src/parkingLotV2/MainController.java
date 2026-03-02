@@ -46,8 +46,8 @@ public class MainController {
         Floor floor = new Floor(1, floor1Spots);
         Floor floor2 = new Floor(2, floor2Spots);
         Map<Integer, Floor> floors = Map.of(
-                floor.getFloorNumber(), floor,
-                floor2.getFloorNumber(), floor2
+                floor.floorNumber(), floor,
+                floor2.floorNumber(), floor2
         );
 
         ParkingLot parkingLot = new ParkingLot(floors, new NearestSpot(), new FlatRate(200.0));
@@ -63,17 +63,17 @@ public class MainController {
         // Park the vehicles
 
         try {
-            Ticket ticket1 = parkingLot.parkVehicle(bike1);
+            Ticket ticket1 = parkingLot.parkVehicle(bike1).get();
             Thread.sleep(100);
-            Ticket ticket2 = parkingLot.parkVehicle(bike2);
+            Ticket ticket2 = parkingLot.parkVehicle(bike2).get();
             Thread.sleep(900);
-            Ticket ticket3 = parkingLot.parkVehicle(bike3);
-            Ticket ticket4 = parkingLot.parkVehicle(car1);
+            Ticket ticket3 = parkingLot.parkVehicle(bike3).get();
+            Ticket ticket4 = parkingLot.parkVehicle(car1).get();
 
             System.out.println("Parking lot state after parking vehicles:");
             parkingLot.getFloors().forEach((floorNumber, floorObj) -> {
                 System.out.println("Floor " + floorNumber + ":");
-                floorObj.getParkingSpots().forEach((spotId, spot) -> {
+                floorObj.parkingSpots().forEach((spotId, spot) -> {
                     System.out.println("  Spot " + spotId + " (" + spot.getSpotType() + "): " +
                             (!spot.getParkedVehicle().isEmpty() ? "Occupied by " + spot.getParkedVehicle() : "Available"));
                 });
@@ -94,7 +94,7 @@ public class MainController {
         System.out.println("Parking lot state after parking vehicles:");
         parkingLot.getFloors().forEach((floorNumber, floorObj) -> {
             System.out.println("Floor " + floorNumber + ":");
-            floorObj.getParkingSpots().forEach((spotId, spot) -> {
+            floorObj.parkingSpots().forEach((spotId, spot) -> {
                 System.out.println("  Spot " + spotId + " (" + spot.getSpotType() + "): " +
                         (!spot.getParkedVehicle().isEmpty() ? "Occupied by " + spot.getParkedVehicle() : "Available"));
             });

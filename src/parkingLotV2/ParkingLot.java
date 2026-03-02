@@ -8,7 +8,6 @@ import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.parkingStrategy.ParkingStrategy;
 import parkingLotV2.paymentStrategy.PaymentStrategy;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,16 +18,16 @@ public class ParkingLot {
     private final ParkingStrategy parkingStrategy;
     private final PaymentStrategy paymentStrategy;
 
-    private void addFloor(Floor floor) {
-        floors.put(floor.getFloorNumber(), new Floor(floor.getFloorNumber(), floor.getParkingSpots()));
-    }
-
     public ParkingLot(Map<Integer, Floor> floors, ParkingStrategy parkingStrategy, PaymentStrategy paymentStrategy) {
         this.floors = floors;
         this.floorsCount = floors.size();
         this.ticketManager = new TikcetManager();
         this.parkingStrategy = parkingStrategy;
         this.paymentStrategy = paymentStrategy;
+    }
+
+    private void addFloor(Floor floor) {
+        floors.put(floor.floorNumber(), new Floor(floor.floorNumber(), floor.parkingSpots()));
     }
 
     public Map<String, Ticket> getTicketmap() {
@@ -43,19 +42,20 @@ public class ParkingLot {
         return floorsCount;
     }
 
-    public Ticket parkVehicle(Vehicle vehicle) {
+    public Optional<Ticket> parkVehicle(Vehicle vehicle) {
+        Optional<Ticket> ticketOptional = Optional.empty();
         Optional<ParkingSpotDto> spotDto = parkingStrategy.getParkingSpot(this, vehicle.getVehicleType());
         if (spotDto.isPresent()) {
-            floors.get(spotDto.get().getFloorNumber()).park(vehicle, spotDto.get().getSpotId());
-            return ticketManager.generateTicket(vehicle, spotDto.get());
+            floors.get(spotDto.get().floorNumber()).park(vehicle, spotDto.get().spotId());
+            return Optional.ofNullable(ticketManager.generateTicket(vehicle, spotDto.get()));
         }
-        return null;
+        return ticketOptional;
     }
 
     public synchronized Ticket unparkVehicle(Ticket ticket) {
         ticketManager.setExitTime(ticket.getTicketId());
         ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
-        ParkingSpot parkingSpot = floors.get(parkingSpotDto.getFloorNumber()).getParkingSpots().get(parkingSpotDto.getSpotId());
+        ParkingSpot parkingSpot = floors.get(parkingSpotDto.floorNumber()).parkingSpots().get(parkingSpotDto.spotId());
         parkingSpot.unpark();
         Double amount = paymentStrategy.pay(ticket);
         ticket.setParkingFee(amount);

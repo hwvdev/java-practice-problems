@@ -1,6 +1,5 @@
 package parkingLotV2.entities;
 
-import parkingLotV2.ParkingLot;
 import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.enums.SpotType;
 import parkingLotV2.enums.VehicleType;

@@ -10,13 +10,9 @@ public class Ticket {
     private final String ticketId;
     private final ParkingSpotDto parkingSpotDto;
     private final long entryTime;
-    private long exitTime = 0L;
     private final Vehicle vehicle;
+    private long exitTime = 0L;
     private double parkingFee;
-
-    public SpotType spotType() {
-        return parkingSpotDto.getSpotType();
-    }
 
     public Ticket(ParkingSpotDto parkingSpot, Vehicle vehicle) {
         this.ticketId = UUID.randomUUID().toString();
@@ -24,6 +20,10 @@ public class Ticket {
         this.entryTime = System.currentTimeMillis();
         this.vehicle = vehicle;
         this.parkingFee = 0;
+    }
+
+    public SpotType spotType() {
+        return parkingSpotDto.spotType();
     }
 
     public String getTicketId() {

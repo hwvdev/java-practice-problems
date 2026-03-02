@@ -1,34 +1,29 @@
 package parkingLotV2.entities;
 
 import parkingLotV2.entities.vehicle.Vehicle;
-import parkingLotV2.enums.SpotType;
 import parkingLotV2.enums.VehicleType;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
-public class Floor {
-    private final int floorNumber;
-    private final Map<Integer, ParkingSpot> parkingSpots;
-
+public record Floor(int floorNumber, Map<Integer, ParkingSpot> parkingSpots) {
     public Floor(int floorNumber, Map<Integer, ParkingSpot> parkingSpots) {
         this.floorNumber = floorNumber;
         this.parkingSpots = new ConcurrentHashMap<>();
         if (parkingSpots != null && !parkingSpots.isEmpty()) {
-            for (Map.Entry<Integer, ParkingSpot> spotEntry: parkingSpots.entrySet()) {
+            for (Map.Entry<Integer, ParkingSpot> spotEntry : parkingSpots.entrySet()) {
                 ParkingSpot parkingSpot = spotEntry.getValue();
                 this.parkingSpots.put(spotEntry.getKey(), parkingSpot);
             }
         }
     }
 
-    public Map<Integer, ParkingSpot> getParkingSpots() {
+    @Override
+    public Map<Integer, ParkingSpot> parkingSpots() {
         return Collections.unmodifiableMap(parkingSpots);
-    }
-
-    public int getFloorNumber() {
-        return floorNumber;
     }
 
     public void addParkingSpot(ParkingSpot spot) {

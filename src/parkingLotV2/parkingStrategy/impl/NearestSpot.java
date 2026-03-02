@@ -4,21 +4,17 @@ import parkingLotV2.ParkingLot;
 import parkingLotV2.dto.ParkingSpotDto;
 import parkingLotV2.entities.Floor;
 import parkingLotV2.entities.ParkingSpot;
-import parkingLotV2.enums.SpotType;
 import parkingLotV2.enums.VehicleType;
 import parkingLotV2.parkingStrategy.ParkingStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class NearestSpot implements ParkingStrategy {
     @Override
     public Optional<ParkingSpotDto> getParkingSpot(ParkingLot parkingLot, VehicleType vehicleType) {
         Optional<ParkingSpotDto> parkingSpotDto = Optional.empty();
-        for (Map.Entry<Integer, Floor> floorEntry: parkingLot.getFloors().entrySet()) {
+        for (Map.Entry<Integer, Floor> floorEntry : parkingLot.getFloors().entrySet()) {
             Floor floor = floorEntry.getValue();
             Optional<ParkingSpot> availableSpot = floor.getAvailableSpots(vehicleType);
             if (availableSpot.isPresent())
