@@ -26,15 +26,12 @@ public class TicketManager {
         return ticket;
     }
 
-    public AtomicReference<Ticket> closeTicket(String ticketId) {
-        AtomicReference<Ticket> ticket = new AtomicReference<>(null);
-        activeTickets.compute(ticketId, (k, existingticket) -> {
+    public Ticket closeTicket(String ticketId) {
+        return activeTickets.compute(ticketId, (k, existingticket) -> {
             if (existingticket == null)
                 throw new IllegalStateException("Invalid Ticket");
             existingticket.setExitTime();
-            ticket.set(existingticket);
-            return null;
+            return existingticket;
         });
-        return ticket;
     }
 }

@@ -2,7 +2,6 @@ package parkingLotV2;
 
 import parkingLotV2.dto.ParkingSpotDto;
 import parkingLotV2.entities.Floor;
-import parkingLotV2.entities.ParkingSpot;
 import parkingLotV2.entities.Ticket;
 import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.parkingStrategy.ParkingStrategy;
@@ -10,11 +9,9 @@ import parkingLotV2.payment.PaymentMethod;
 import parkingLotV2.payment.PaymentResponse;
 import parkingLotV2.payment.PaymentService;
 import parkingLotV2.payment.PaymentStatus;
-import parkingLotV2.payment.processor.PaymentProcessor;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ParkingLot {
     private final Map<Integer, Floor> floors;
@@ -58,18 +55,15 @@ public class ParkingLot {
     }
 
     public synchronized Ticket unparkVehicle(String ticketId) throws InterruptedException {
-        AtomicReference<Ticket> ticketRef = ticketManager.closeTicket(ticketId);
-        Ticket ticket = ticketRef.get();
+        Ticket ticket = ticketManager.closeTicket(ticketId);
         Optional<PaymentResponse> paymentResponse = paymentService.processPayment(ticket, PaymentMethod.UPI);
+        ticket.setParkingFee(paymentResponse.get().getAmount());
 
-        if (paymentResponse.isPresent() && PaymentStatus.SUCCESS.equals(paymentResponse.get().getPaymentStatus())) {
+        if (PaymentStatus.SUCCESS.equals(paymentResponse.get().getPaymentStatus())) {
             ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
-            ParkingSpot parkingSpot = Optional.ofNullable(floors.get(parkingSpotDto.floorNumber()))
-                    .map(Floor::parkingSpots)
-                    .map(spot -> spot.get(parkingSpotDto.spotId()))
+            Floor floor = Optional.ofNullable(floors.get(parkingSpotDto.floorNumber()))
                     .orElseThrow(() -> new IllegalStateException("Invalid"));
-            ticket.setParkingFee(paymentResponse.get().getAmount());
-            parkingSpot.unpark();
+            floor.unpark(parkingSpotDto.spotId());
         }
         System.out.println(ticket);
         return ticket;

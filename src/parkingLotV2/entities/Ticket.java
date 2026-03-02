@@ -33,8 +33,6 @@ public class Ticket {
     public void setExitTime() {
         if (exitTime == 0L) {
             this.exitTime = System.currentTimeMillis();
-        } else {
-            throw new IllegalStateException("Exit time is already set.");
         }
     }
 
