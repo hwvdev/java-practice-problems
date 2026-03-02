@@ -9,6 +9,8 @@ import parkingLotV2.entities.vehicle.Vehicle;
 import parkingLotV2.enums.SpotType;
 import parkingLotV2.enums.VehicleType;
 import parkingLotV2.parkingStrategy.impl.NearestSpot;
+import parkingLotV2.payment.PaymentMethod;
+import parkingLotV2.payment.PaymentResponse;
 import parkingLotV2.payment.PaymentService;
 import parkingLotV2.payment.strategy.FlatRateStrategy;
 
@@ -80,9 +82,14 @@ public class MainController {
             });
 
             Thread.sleep(1000);
-            parkingLot.unparkVehicle(ticket1.getTicketId());
-            parkingLot.unparkVehicle(ticket4.getTicketId());
-            parkingLot.unparkVehicle(ticket1.getTicketId());
+            Ticket unparked1 = parkingLot.unparkVehicle(ticket1.getTicketId());
+            Ticket unparked2 = parkingLot.unparkVehicle(ticket4.getTicketId());
+
+            PaymentResponse paymentResponse1 = paymentService.pay(unparked1.getParkingFee(), PaymentMethod.CARD, unparked1);
+            PaymentResponse paymentResponse2 = paymentService.pay(unparked2.getParkingFee(), PaymentMethod.UPI, unparked2);
+
+            System.out.println(paymentResponse1);
+            System.out.println(paymentResponse2);
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         } catch (InterruptedException e) {

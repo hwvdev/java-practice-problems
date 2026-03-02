@@ -6,6 +6,7 @@ import parkingLotV2.payment.processor.PaymentProcessor;
 import parkingLotV2.payment.processor.PaymentProcessorRegistry;
 import parkingLotV2.payment.strategy.PaymentStrategy;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +23,17 @@ public class PaymentService {
 
     public void setPaymentStrategy(PaymentStrategy paymentStrategy) {
         this.paymentStrategy = paymentStrategy;
+    }
+
+    public Money calcFee(Ticket ticket) {
+        return paymentStrategy.calculateFee(ticket);
+    }
+
+    public PaymentResponse pay(Money amount, PaymentMethod paymentMethod, Ticket ticket) {
+        PaymentProcessor paymentProcessor = paymentProcessorRegistry.getPaymentProcessor(paymentMethod);
+        String idempotentKey = "Key:" + ticket.getTicketId();
+        PaymentRequest paymentRequest = new PaymentRequest(ticket.getTicketId(), idempotentKey, paymentMethod, amount);
+        return paymentProcessor.pay(paymentRequest);
     }
 
     public Optional<PaymentResponse> processPayment(Ticket ticket, PaymentMethod paymentMethod) throws InterruptedException {

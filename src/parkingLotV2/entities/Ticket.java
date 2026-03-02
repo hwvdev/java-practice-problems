@@ -52,6 +52,10 @@ public class Ticket {
         return entryTime;
     }
 
+    public Money getParkingFee() {
+        return parkingFee;
+    }
+
     @Override
     public String toString() {
         return "Ticket{" +
