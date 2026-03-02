@@ -7,7 +7,6 @@ import parkingLotV2.entities.vehicle.Vehicle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TicketManager {
     private final Map<String, Ticket> activeTickets;

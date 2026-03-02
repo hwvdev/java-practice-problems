@@ -4,7 +4,6 @@ import parkingLotV2.payment.PaymentMethod;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 public class PaymentProcessorRegistry {
     private final Map<PaymentMethod, PaymentProcessor> paymentRegistry = new HashMap<>();

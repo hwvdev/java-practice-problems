@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PaymentService {
-    private PaymentStrategy paymentStrategy;
     private final PaymentProcessorRegistry paymentProcessorRegistry;
     private final Map<String, PaymentResponse> paymentStatus = new ConcurrentHashMap<>();
+    private PaymentStrategy paymentStrategy;
 
     public PaymentService(PaymentStrategy paymentStrategy) {
         this.paymentStrategy = paymentStrategy;
@@ -35,11 +35,11 @@ public class PaymentService {
             PaymentRequest paymentRequest = new PaymentRequest(ticket.getTicketId(), idempotentKey, paymentMethod, amount);
 
             paymentResponse = Optional.of(paymentProcessor.pay(paymentRequest));
-            paymentStatus.put(paymentResponse.get().getTxnId(), paymentResponse.get());
+            paymentStatus.put(paymentResponse.get().txnId(), paymentResponse.get());
             if (paymentResponse.isPresent()) {
-                if (PaymentStatus.SUCCESS.equals(paymentResponse.get().getPaymentStatus())) {
+                if (PaymentStatus.SUCCESS.equals(paymentResponse.get().paymentStatus())) {
                     break;
-                } else if (PaymentStatus.FAILURE.equals(paymentResponse.get().getPaymentStatus())) {
+                } else if (PaymentStatus.FAILURE.equals(paymentResponse.get().paymentStatus())) {
                     attempt++;
                     Thread.sleep(4000);
                 } else {

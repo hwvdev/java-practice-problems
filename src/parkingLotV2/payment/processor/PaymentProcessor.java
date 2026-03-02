@@ -6,5 +6,6 @@ import parkingLotV2.payment.PaymentResponse;
 
 public interface PaymentProcessor {
     PaymentMethod paymentMethod();
+
     PaymentResponse pay(PaymentRequest paymentRequest);
 }

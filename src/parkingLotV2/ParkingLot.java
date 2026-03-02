@@ -57,9 +57,9 @@ public class ParkingLot {
     public synchronized Ticket unparkVehicle(String ticketId) throws InterruptedException {
         Ticket ticket = ticketManager.closeTicket(ticketId);
         Optional<PaymentResponse> paymentResponse = paymentService.processPayment(ticket, PaymentMethod.UPI);
-        ticket.setParkingFee(paymentResponse.get().getAmount());
+        ticket.setParkingFee(paymentResponse.get().amount());
 
-        if (PaymentStatus.SUCCESS.equals(paymentResponse.get().getPaymentStatus())) {
+        if (PaymentStatus.SUCCESS.equals(paymentResponse.get().paymentStatus())) {
             ParkingSpotDto parkingSpotDto = ticket.getParkingSpotDto();
             Floor floor = Optional.ofNullable(floors.get(parkingSpotDto.floorNumber()))
                     .orElseThrow(() -> new IllegalStateException("Invalid"));
