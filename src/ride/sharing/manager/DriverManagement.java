@@ -4,7 +4,6 @@ import ride.sharing.entities.Driver;
 import ride.sharing.entities.DriverStatus;
 import ride.sharing.service.DriverService;
 import ride.sharing.service.LocationService;
-import ride.sharing.strategy.RideMatchingStrategy;
 
 public class DriverManagement {
     private final DriverService driverService;
@@ -16,9 +15,11 @@ public class DriverManagement {
     }
 
     public void addDriver(String driverId, int x, int y) {
-        int xx = x / RideMatchingStrategy.gridSize;
-        int yy = y / RideMatchingStrategy.gridSize;
-        driverService.addDriver(driverId, xx, yy);
+        driverService.addDriver(driverId, x, y);
+    }
+
+    public Driver getDriverById(String driverId) {
+        return driverService.getDriverById(driverId);
     }
 
     public void changeStatus(String driverId, DriverStatus driverStatus) {

@@ -41,6 +41,10 @@ public class Driver {
         return cell;
     }
 
+    public boolean isAvailable() {
+        return driverStatusAtomicReference.get() == DriverStatus.AVAILABLE;
+    }
+
     @Override
     public String toString() {
         return "Driver{" +

@@ -5,7 +5,6 @@ import ride.sharing.entities.Driver;
 import ride.sharing.repo.DriverRepo;
 import ride.sharing.repo.LocationRepo;
 import ride.sharing.repo.LockManager;
-import ride.sharing.strategy.RideMatchingStrategy;
 
 public class LocationService {
     private final LocationRepo locationRepo;
@@ -20,13 +19,11 @@ public class LocationService {
 
     public void update(String driverId, int x, int y) {
         Object lock = lockManager.getDriverLock(driverId);
-        int xx = x / RideMatchingStrategy.gridSize;
-        int yy = y / RideMatchingStrategy.gridSize;
 
         synchronized (lock) {
             Driver driver = driverRepo.getDriverMap().get(driverId);
             Cell prevCell = driver.getCell();
-            Cell currCell = new Cell(xx, yy);
+            Cell currCell = new Cell(x, y);
             driver.updateLocation(currCell);
 
             locationRepo.removeDriverFromCell(prevCell, driverId);

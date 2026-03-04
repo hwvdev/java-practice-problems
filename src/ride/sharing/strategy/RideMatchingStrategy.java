@@ -1,9 +1,9 @@
 package ride.sharing.strategy;
 
-import ride.sharing.entities.Driver;
+import ride.sharing.entities.Ride;
+import ride.sharing.repo.LocationRepo;
+import ride.sharing.service.DispatcherService;
 
 public interface RideMatchingStrategy {
-    int gridSize = 1;
-
-    Driver findAndAcquireDriver(int x, int y) throws InterruptedException;
+    void searchDriver(int x, int y, LocationRepo locationRepo, DispatcherService dispatcherService, Ride ride);
 }
